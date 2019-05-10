@@ -1,17 +1,19 @@
-import pathlib
+import os
 
 from keras.applications import DenseNet201 as DenseNet
 from keras.applications.densenet import preprocess_input
 from keras.models import load_model
 from keras.preprocessing.image import ImageDataGenerator
 
-TRAIN_DATA_PATH = "Kaggle_Dataset/Data/Train"
-VALIDATION_DATA_PATH = "Kaggle_Dataset/Data/Eval"
-TEST_DATA_PATH = "Kaggle_Dataset/Data/Test"
-MODEL_PATH = "model.h5"
+DATA_PATH = os.path.join(os.path.dirname(__file__), "data")
+TRAIN_DATA_PATH = os.path.join(DATA_PATH, "train")
+VALIDATION_DATA_PATH = os.path.join(DATA_PATH, "validate")
+TEST_DATA_PATH = os.path.join(DATA_PATH, "test")
+
+MODEL_PATH = os.path.join(DATA_PATH, "model.h5")
 
 
-def initialize_model(reinitialize=False):
+def create_model(reinitialize=False):
     """Initialize a machine learning model for image classification.
     
     Args:
@@ -23,9 +25,7 @@ def initialize_model(reinitialize=False):
         keras.Model: a prefitted model instance.
     """
     if not reinitialize:
-        model_file = pathlib.Path(MODEL_PATH)
-        model_exists = model_file.exists() and model_file.is_file()
-        if model_exists:
+        if os.path.exists(MODEL_PATH) and os.path.isfile(MODEL_PATH):
             return load_model(MODEL_PATH)
 
     model = DenseNet(include_top=True, weights=None, classes=3)
@@ -60,7 +60,11 @@ def predict(sample):
     Returns:
         list
     """
-    model = initialize_model()
+    model = create_model()
     sample = preprocess_input(sample)
 
     return model.predict(sample)
+
+
+if __name__ == "__main__":
+    model = create_model()
