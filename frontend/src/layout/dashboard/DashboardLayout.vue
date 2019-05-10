@@ -8,7 +8,7 @@
           label-idle="Drop Images here..."
           allow-multiple="true"
           accepted-file-types="image/jpeg, image/png"
-          server="/api"
+          server="http://127.0.0.1:8000/test/"
           v-bind:files="myFiles"
           v-on:init="handleFilePondInit"
           style="margin-right:5%;margin-left:5%;"
@@ -123,10 +123,27 @@ export default {
     return { myFiles: [], output: null };
   },
   methods: {
+    getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        var cookies = document.cookie.split(";");
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i].trim();
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    },
+
     updateMap() {
       axios({
         method: "post",
         url: "http://127.0.0.1:8000/test/",
+
         auth: {
           username: "admin",
           password: "password123"
