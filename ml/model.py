@@ -13,7 +13,7 @@ TEST_DATA_PATH = os.path.join(DATA_PATH, "test")
 MODEL_PATH = os.path.join(DATA_PATH, "model.h5")
 
 
-def initialize_model(reinitialize=False):
+def create_model(reinitialize=False):
     """Initialize a machine learning model for image classification.
     
     Args:
@@ -60,7 +60,11 @@ def predict(sample):
     Returns:
         list
     """
-    model = initialize_model()
+    model = create_model()
     sample = preprocess_input(sample)
 
     return model.predict(sample)
+
+
+if __name__ == "__main__":
+    model = create_model()
