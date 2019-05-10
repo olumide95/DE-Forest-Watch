@@ -110,6 +110,7 @@ import TopNavbar from "./TopNavbar.vue";
 import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import MobileMenu from "./MobileMenu";
+import axios from "axios";
 export default {
   components: {
     TopNavbar,
@@ -123,6 +124,18 @@ export default {
   },
   methods: {
     updateMap() {
+      axios({
+        method: "post",
+        url: "http://127.0.0.1:8000/test/",
+        auth: {
+          username: "admin",
+          password: "password123"
+        }
+      })
+        .then(response => console.log(response.data))
+        .catch(error => {})
+        .finally(() => ({}));
+
       this.output = [this.$refs.long.value, this.$refs.lat.value];
       serverBus.$emit("long", this.output);
     },
