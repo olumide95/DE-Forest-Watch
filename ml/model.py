@@ -5,9 +5,9 @@ from keras.applications.densenet import preprocess_input
 from keras.models import load_model
 from keras.preprocessing.image import ImageDataGenerator
 
-TRAIN_DATA_PATH = "Kaggle_Dataset/Data/Train"
-VALIDATION_DATA_PATH = "Kaggle_Dataset/Data/Eval"
-TEST_DATA_PATH = "Kaggle_Dataset/Data/Test"
+TRAIN_DATA_PATH = "ml/data/train"
+VALIDATION_DATA_PATH = "ml/data/validate"
+TEST_DATA_PATH = "ml/data/test"
 MODEL_PATH = "model.h5"
 
 
