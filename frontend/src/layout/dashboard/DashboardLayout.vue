@@ -218,6 +218,7 @@ export default {
 
       this.output = [this.$refs.long.value, this.$refs.lat.value];
       serverBus.$emit("long", this.output);
+      serverBus.$emit("update", 1);
       this.isLoading = false;
     },
 

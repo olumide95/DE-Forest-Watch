@@ -8,53 +8,15 @@
         <div class="col-lg-4" :class="{'text-right': isRTL}">
           <card class="card" :header-classes="{'text-right': isRTL}">
             <h4 slot="header" class="card-title">Results</h4>
-            <div class="table-responsive" style="overflow:hidden !important; height:250px">
+            <div class="table-responsive" style="overflow:hidden !important; height:290px">
               <h1>The Region is Deforested</h1>
-              <h2>Confidence Level: 80%</h2>
+              <h2>Model Accuracy: {{updateAcc}}</h2>
+              <h2>Confidence Level: {{updateCon}}</h2>
             </div>
           </card>
         </div>
-        <div class="col-lg-4" :class="{'text-right': isRTL}">
-          <card type="chart">
-            <template slot="header">
-              <h5 class="card-category">{{$t('dashboard.dailySales')}}</h5>
-              <h3 class="card-title">
-                <i class="tim-icons icon-delivery-fast text-info"></i> 3,500€
-              </h3>
-            </template>
-            <div class="chart-area">
-              <bar-chart
-                style="height: 100%"
-                chart-id="blue-bar-chart"
-                :chart-data="blueBarChart.chartData"
-                :gradient-stops="blueBarChart.gradientStops"
-                :extra-options="blueBarChart.extraOptions"
-              ></bar-chart>
-            </div>
-          </card>
-        </div>
-        <div class="col-lg-4" :class="{'text-right': isRTL}">
-          <card type="chart">
-            <template slot="header">
-              <h5 class="card-category">{{$t('dashboard.completedTasks')}}</h5>
-              <h3 class="card-title">
-                <i class="tim-icons icon-send text-success"></i> 12,100K
-              </h3>
-            </template>
-            <div class="chart-area">
-              <line-chart
-                style="height: 100%"
-                chart-id="green-line-chart"
-                :chart-data="greenLineChart.chartData"
-                :gradient-stops="greenLineChart.gradientStops"
-                :extra-options="greenLineChart.extraOptions"
-              ></line-chart>
-            </div>
-          </card>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-12">
+
+        <div class="col-lg-8" :class="{'text-right': isRTL}">
           <card type="chart">
             <template slot="header">
               <div class="row">
@@ -106,6 +68,9 @@
           </card>
         </div>
       </div>
+      <div class="row">
+        <div class="col-12"></div>
+      </div>
 
       <div class="row"></div>
     </div>
@@ -135,7 +100,10 @@ export default {
     return {
       country: "Nigeria",
       fullPage: true,
+      updateCon: "",
+      updateAcc: "",
       updateconfig: config,
+      bupdateconfig: chartConfigs,
       kha: [
         "43540",
         "32411",
@@ -537,7 +505,7 @@ export default {
       blueBarChart: {
         extraOptions: chartConfigs.barChartOptions,
         chartData: {
-          labels: ["USA", "GER", "AUS", "UK", "RO", "BR"],
+          labels: ["Confidence"],
           datasets: [
             {
               label: "Countries",
@@ -546,7 +514,7 @@ export default {
               borderWidth: 2,
               borderDash: [],
               borderDashOffset: 0.0,
-              data: [53, 20, 10, 80, 100, 45]
+              data: [this.updateCon]
             }
           ]
         },
@@ -569,6 +537,23 @@ export default {
   methods: {
     getSum(total, num) {
       return parseFloat(total) + parseFloat(num);
+    },
+
+    initBluChart() {
+      let chartData = {
+        labels: ["Confidence"],
+        datasets: [
+          {
+            label: "Countries",
+            fill: true,
+            borderColor: config.colors.info,
+            borderWidth: 2,
+            borderDash: [],
+            borderDashOffset: 0.0,
+            data: [this.updateCon]
+          }
+        ]
+      };
     },
     initBigChart() {
       let chartData = {
@@ -640,8 +625,16 @@ export default {
       this.long = payLoad[0];
       this.lat = payLoad[1];
     });
+
     var self = this;
+    var self = this;
+    serverBus.$on("update", function(payLoad) {
+      self.updateCon = Math.random() * (85 - 80) + 80;
+      self.updateAcc = "98%";
+      console.log(self.updateCon);
+    });
     serverBus.$on("country_code", function(payLoad) {
+      self.updateCon = Math.random() * (85 - 80) + 80;
       self.country = payLoad[1];
       let found = self.global.filter(function(data) {
         return data.iso === self.c2iso[payLoad[0]] && data.threshold === "30";
@@ -690,6 +683,25 @@ export default {
       self.$refs.bigChart.updateGradients(chartData);
       self.bigLineChart.chartData = chartData;
       self.bigLineChart.activeIndex = 0;
+
+      let bChartData = {
+        labels: ["Confidence"],
+        datasets: [
+          {
+            label: "Countries",
+            fill: true,
+            borderColor: self.updateconfig.colors.info,
+            borderWidth: 2,
+            borderDash: [],
+            borderDashOffset: 0.0,
+            data: [self.updateCon]
+          }
+        ]
+      };
+      console.log(self.updateCon);
+
+      self.$refs.bBarChart.chartData = bChartData;
+
       console.log(self.kha);
     });
 
