@@ -99,7 +99,6 @@ export default {
   data() {
     return {
       country: "Nigeria",
-      fullPage: true,
       updateCon: "",
       updateAcc: "",
       updateconfig: config,
@@ -607,7 +606,7 @@ export default {
           this.global = Papa.parse(response.data, this.myconfig).data;
         })
         .catch(error => {})
-        .finally(() => ({}));
+        .finally(() => (this.isLoading = false));
     }
   },
   mounted() {
@@ -627,14 +626,14 @@ export default {
     });
 
     var self = this;
-    var self = this;
     serverBus.$on("update", function(payLoad) {
-      self.updateCon = Math.random() * (85 - 80) + 80;
+      self.updateCon = (Math.random() * (85 - 80) + 80) / 100;
       self.updateAcc = "98%";
       console.log(self.updateCon);
     });
+    var self = this;
     serverBus.$on("country_code", function(payLoad) {
-      self.updateCon = Math.random() * (85 - 80) + 80;
+      self.updateCon = (Math.random() * (85 - 80) + 80) / 100;
       self.country = payLoad[1];
       let found = self.global.filter(function(data) {
         return data.iso === self.c2iso[payLoad[0]] && data.threshold === "30";
@@ -694,18 +693,11 @@ export default {
             borderWidth: 2,
             borderDash: [],
             borderDashOffset: 0.0,
-            data: [self.updateCon]
+            data: []
           }
         ]
       };
-      console.log(self.updateCon);
-
-      self.$refs.bBarChart.chartData = bChartData;
-
-      console.log(self.kha);
     });
-
-    this.isLoading = false;
   },
   beforeDestroy() {
     if (this.$rtl.isRTL) {
