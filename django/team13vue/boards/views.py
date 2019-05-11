@@ -1,20 +1,24 @@
-from django.contrib.auth.models import User
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Board, Topic, Post
-from .forms import NewTopicForm
-from django.http import HttpResponse
-from django.http import JsonResponse
-from django.conf import settings
-from django.core.files.storage import FileSystemStorage
-import requests
-import sys
+import base64
 import hashlib
 import hmac
-import base64
+import os
+import sys
+
+import requests
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from requests.packages.urllib3.util import parse_url
+
+from .forms import NewTopicForm
+from .ml import predict
+from .models import Board, Post, Topic
+
 # Create your views here.
 
-from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def upload(request):
@@ -25,13 +29,18 @@ def upload(request):
         fs = FileSystemStorage()
         filename = fs.save(myfile.name, myfile)
         uploaded_file_url = fs.url(filename)
-        return JsonResponse({'image':str(uploaded_file_url)})
+
+        prediction = predict(filename)
+
+        return JsonResponse({'image':str(uploaded_file_url), 'prediction': prediction})
 
 def getimage(request):
     if request.method == 'GET':
         
         imgUrl = str(GetIMageFromCoordinate(request.GET['latitude'],request.GET['longitude']))
-        return JsonResponse({'imageUrl':imgUrl})
+        filename = getImage(imgUrl)
+        prediction = predict(filename)
+        return JsonResponse({'imageUrl':imgUrl, 'prediction': prediction})
      
 
 
@@ -49,7 +58,6 @@ def sign_url(input_url=None, key=None, client_secret=None):
       Returns:
       The signed request URL
   """
-
   # Return if any parameters aren't given
   if not input_url or not key or not client_secret:
     return None
@@ -87,11 +95,13 @@ def getImage(url):
     except requests.exceptions.RequestException as e:
             print(e)
             sys.exit(1)
-    img = response.content
-    
-    with open('forest.png','wb') as f:
-            f.write(img)
-    return url
+
+    filename = os.path.join(settings.MEDIA_ROOT, 'upload.png')
+    with open(filename, 'wb') as f:
+            f.write(response.content)
+
+    return filename
+
 def GetIMageFromCoordinate(lat,long): 
     
     url = sign_url('https://maps.googleapis.com/maps/api/staticmap?center='+str(lat)+','+str(long)+'&zoom=13&size=622x656&maptype=satellite&sensor=false&scale=1','AIzaSyDW6cuT1zime0ZKVjjiPdytH0Zw3Lu-zng','csXUTpXVywdChe162O39li2jKAM=')
