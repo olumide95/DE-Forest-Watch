@@ -60,6 +60,7 @@ def load_sample_image(filepath, target_size=(200, 200)):
     # the model expects a sample of images, convert the single image to a
     # sample of length 1
     sample = np.expand_dims(image, axis=0)
+    sample = sample.reshape(len(sample), -1)
 
     return sample
 
@@ -88,8 +89,15 @@ def predict(image_path):
     estimator = create_model()
     sample = load_sample_image(image_path)
 
-    return estimator.predict(sample)
+    prediction = estimator.predict(sample)[0]
+
+    return "Forest" if prediction == 1 else "Not Forest"
 
 
 if __name__ == "__main__":
-    compare_models()
+    forest = "/home/abraham/ForestWatch/DE-Forest-Watch/ml/data/test/MatureForest/vegetation1707.jpg"
+    print(predict(forest))
+
+    deforest = "/home/abraham/ForestWatch/DE-Forest-Watch/ml/data/test/Deforested/dirt1_13-3-164.jpg"
+    print(predict(deforest))
+
