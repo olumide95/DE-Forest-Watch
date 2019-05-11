@@ -1,8 +1,5 @@
 <template>
   <div class="wrapper">
-    <div class="vld-parent">
-      <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="fullPage"></loading>
-    </div>
     <side-bar>
       <template slot="links">
         <file-pond
@@ -115,18 +112,14 @@ import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import MobileMenu from "./MobileMenu";
 import axios from "axios";
-// Import component
-import Loading from "vue-loading-overlay";
-// Import stylesheet
-import "vue-loading-overlay/dist/vue-loading.css";
+
 export default {
   components: {
     TopNavbar,
     ContentFooter,
     DashboardContent,
     MobileMenu,
-    FilePond,
-    Loading
+    FilePond
   },
   data: function() {
     return {
@@ -174,8 +167,6 @@ export default {
           };
         }
       },
-      isLoading: false,
-      fullPage: true,
       myFiles: [],
       output: null
     };
@@ -198,7 +189,6 @@ export default {
     },
 
     updateMap() {
-      this.isLoading = true;
       axios({
         method: "get",
         url:
@@ -218,7 +208,7 @@ export default {
 
       this.output = [this.$refs.long.value, this.$refs.lat.value];
       serverBus.$emit("long", this.output);
-      this.isLoading = false;
+      serverBus.$emit("update", 1);
     },
 
     toggleSidebar() {

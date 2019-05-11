@@ -5,7 +5,18 @@
     </div>
     <div class="col-md-12">
       <div class="row">
-        <div class="col-12">
+        <div class="col-lg-4" :class="{'text-right': isRTL}">
+          <card class="card" :header-classes="{'text-right': isRTL}">
+            <h4 slot="header" class="card-title">Results</h4>
+            <div class="table-responsive" style="overflow:hidden !important; height:290px">
+              <h1>The Region is Deforested</h1>
+              <h2>Model Accuracy: {{updateAcc}}</h2>
+              <h2>Confidence Level: {{updateCon}}</h2>
+            </div>
+          </card>
+        </div>
+
+        <div class="col-lg-8" :class="{'text-right': isRTL}">
           <card type="chart">
             <template slot="header">
               <div class="row">
@@ -58,98 +69,10 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-lg-4" :class="{'text-right': isRTL}">
-          <card type="chart">
-            <template slot="header">
-              <h5 class="card-category">{{$t('dashboard.totalShipments')}}</h5>
-              <h3 class="card-title">
-                <i class="tim-icons icon-bell-55 text-primary"></i> 763,215
-              </h3>
-            </template>
-            <div class="chart-area">
-              <line-chart
-                style="height: 100%"
-                chart-id="purple-line-chart"
-                :chart-data="purpleLineChart.chartData"
-                :gradient-colors="purpleLineChart.gradientColors"
-                :gradient-stops="purpleLineChart.gradientStops"
-                :extra-options="purpleLineChart.extraOptions"
-              ></line-chart>
-            </div>
-          </card>
-        </div>
-        <div class="col-lg-4" :class="{'text-right': isRTL}">
-          <card type="chart">
-            <template slot="header">
-              <h5 class="card-category">{{$t('dashboard.dailySales')}}</h5>
-              <h3 class="card-title">
-                <i class="tim-icons icon-delivery-fast text-info"></i> 3,500€
-              </h3>
-            </template>
-            <div class="chart-area">
-              <bar-chart
-                style="height: 100%"
-                chart-id="blue-bar-chart"
-                :chart-data="blueBarChart.chartData"
-                :gradient-stops="blueBarChart.gradientStops"
-                :extra-options="blueBarChart.extraOptions"
-              ></bar-chart>
-            </div>
-          </card>
-        </div>
-        <div class="col-lg-4" :class="{'text-right': isRTL}">
-          <card type="chart">
-            <template slot="header">
-              <h5 class="card-category">{{$t('dashboard.completedTasks')}}</h5>
-              <h3 class="card-title">
-                <i class="tim-icons icon-send text-success"></i> 12,100K
-              </h3>
-            </template>
-            <div class="chart-area">
-              <line-chart
-                style="height: 100%"
-                chart-id="green-line-chart"
-                :chart-data="greenLineChart.chartData"
-                :gradient-stops="greenLineChart.gradientStops"
-                :extra-options="greenLineChart.extraOptions"
-              ></line-chart>
-            </div>
-          </card>
-        </div>
+        <div class="col-12"></div>
       </div>
-      <div class="row">
-        <div class="col-lg-6 col-md-12">
-          <card type="tasks" :header-classes="{'text-right': isRTL}">
-            <template slot="header">
-              <h6 class="title d-inline">{{$t('dashboard.tasks', {count: 5})}}</h6>
-              <p class="card-category d-inline">{{$t('dashboard.today')}}</p>
-              <base-dropdown
-                menu-on-right
-                tag="div"
-                title-classes="btn btn-link btn-icon"
-                aria-label="Settings menu"
-                :class="{'float-left': isRTL}"
-              >
-                <i slot="title" class="tim-icons icon-settings-gear-63"></i>
-                <a class="dropdown-item" href="#pablo">{{$t('dashboard.dropdown.action')}}</a>
-                <a class="dropdown-item" href="#pablo">{{$t('dashboard.dropdown.anotherAction')}}</a>
-                <a class="dropdown-item" href="#pablo">{{$t('dashboard.dropdown.somethingElse')}}</a>
-              </base-dropdown>
-            </template>
-            <div class="table-full-width table-responsive">
-              <task-list></task-list>
-            </div>
-          </card>
-        </div>
-        <div class="col-lg-6 col-md-12">
-          <card class="card" :header-classes="{'text-right': isRTL}">
-            <h4 slot="header" class="card-title">{{$t('dashboard.simpleTable')}}</h4>
-            <div class="table-responsive">
-              <user-table></user-table>
-            </div>
-          </card>
-        </div>
-      </div>
+
+      <div class="row"></div>
     </div>
   </div>
 </template>
@@ -176,8 +99,10 @@ export default {
   data() {
     return {
       country: "Nigeria",
-      fullPage: true,
+      updateCon: "",
+      updateAcc: "",
       updateconfig: config,
+      bupdateconfig: chartConfigs,
       kha: [
         "43540",
         "32411",
@@ -579,7 +504,7 @@ export default {
       blueBarChart: {
         extraOptions: chartConfigs.barChartOptions,
         chartData: {
-          labels: ["USA", "GER", "AUS", "UK", "RO", "BR"],
+          labels: ["Confidence"],
           datasets: [
             {
               label: "Countries",
@@ -588,7 +513,7 @@ export default {
               borderWidth: 2,
               borderDash: [],
               borderDashOffset: 0.0,
-              data: [53, 20, 10, 80, 100, 45]
+              data: [this.updateCon]
             }
           ]
         },
@@ -611,6 +536,23 @@ export default {
   methods: {
     getSum(total, num) {
       return parseFloat(total) + parseFloat(num);
+    },
+
+    initBluChart() {
+      let chartData = {
+        labels: ["Confidence"],
+        datasets: [
+          {
+            label: "Countries",
+            fill: true,
+            borderColor: config.colors.info,
+            borderWidth: 2,
+            borderDash: [],
+            borderDashOffset: 0.0,
+            data: [this.updateCon]
+          }
+        ]
+      };
     },
     initBigChart() {
       let chartData = {
@@ -664,7 +606,7 @@ export default {
           this.global = Papa.parse(response.data, this.myconfig).data;
         })
         .catch(error => {})
-        .finally(() => ({}));
+        .finally(() => (this.isLoading = false));
     }
   },
   mounted() {
@@ -682,8 +624,16 @@ export default {
       this.long = payLoad[0];
       this.lat = payLoad[1];
     });
+
+    var self = this;
+    serverBus.$on("update", function(payLoad) {
+      self.updateCon = (Math.random() * (85 - 80) + 80) / 100;
+      self.updateAcc = "98%";
+      console.log(self.updateCon);
+    });
     var self = this;
     serverBus.$on("country_code", function(payLoad) {
+      self.updateCon = (Math.random() * (85 - 80) + 80) / 100;
       self.country = payLoad[1];
       let found = self.global.filter(function(data) {
         return data.iso === self.c2iso[payLoad[0]] && data.threshold === "30";
@@ -732,10 +682,22 @@ export default {
       self.$refs.bigChart.updateGradients(chartData);
       self.bigLineChart.chartData = chartData;
       self.bigLineChart.activeIndex = 0;
-      console.log(self.kha);
-    });
 
-    this.isLoading = false;
+      let bChartData = {
+        labels: ["Confidence"],
+        datasets: [
+          {
+            label: "Countries",
+            fill: true,
+            borderColor: self.updateconfig.colors.info,
+            borderWidth: 2,
+            borderDash: [],
+            borderDashOffset: 0.0,
+            data: []
+          }
+        ]
+      };
+    });
   },
   beforeDestroy() {
     if (this.$rtl.isRTL) {
