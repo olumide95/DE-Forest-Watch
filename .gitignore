@@ -1,11 +1,7 @@
 #### joe made this: http://goel.io/joe
 
 #### visualstudiocode ####
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+.vscode
 
 
 #### node ####
@@ -304,3 +300,4 @@ fabric.properties
 ml/data/validate
 ml/data/test
 ml/data/train
+ml/data/svm
