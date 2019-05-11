@@ -63,6 +63,10 @@ def get_image(url):
         response.raise_for_status()
 
         filename = os.path.join(settings.MEDIA_ROOT, "upload.png")
+        log.info(f"Google image file: {filename}")
+        print(
+            f"------------------------------------------------------ Google image file: {filename}"
+        )
         with open(filename, "wb") as f:
             f.write(response.content)
 
@@ -80,7 +84,7 @@ def get_image_from_coordinate(lat, long):
             str(lat),
             ",",
             str(long),
-            "&zoom=13&size=622x656&maptype=satellite&sensor=false&scale=1",
+            "&zoom=13&size=200x200&maptype=satellite&sensor=false&scale=1",
         ]
     )
 
@@ -89,5 +93,8 @@ def get_image_from_coordinate(lat, long):
         "AIzaSyDW6cuT1zime0ZKVjjiPdytH0Zw3Lu-zng",
         "csXUTpXVywdChe162O39li2jKAM=",
     )
+
+    log.info(f"------------------------------------------- {url}")
+    print(f"------------------------------------------- {url}")
 
     return get_image(url)

@@ -29,20 +29,30 @@ def upload(request):
 
 
 def get_image(request):
-    try:
-        filename = get_image_from_coordinate(
-            request.GET["latitude"], request.GET["longitude"]
-        )
-        prediction = predict(filename)
-
-        return JsonResponse({"prediction": prediction})
-    except Exception as e:
-        log.error(e)
-
-    return JsonResponse(
-        {"success": False, "message": "Bad request. Provide longitude and latitude."}
+    filename = get_image_from_coordinate(
+        request.GET["latitude"], request.GET["longitude"]
     )
+    prediction = predict(filename)
+
+    return JsonResponse({"prediction": prediction})
+
+    # try:
+    #     filename = get_image_from_coordinate(
+    #         request.GET["latitude"], request.GET["longitude"]
+    #     )
+    #     prediction = predict(filename)
+
+    #     return JsonResponse({"prediction": prediction})
+    # except Exception as e:
+    #     log.exception(e)
+    #     return JsonResponse(
+    #         {
+    #             "success": False,
+    #             "message": "Bad request. Provide longitude and latitude.",
+    #             "error": str(e),
+    #         }
+    #     )
 
 
 def home(request):
-    return render(request, "index.html")
+    return JsonResponse({"success": True, "message": "Welcome to Forest Watch API!"})

@@ -8,7 +8,7 @@
           label-idle="Drop Images here..."
           allow-multiple="true"
           accepted-file-types="image/jpeg, image/png"
-          v-bind:server="myServer"
+          server="http://127.0.0.1:8000/upload"
           v-bind:files="myFiles"
           v-on:init="handleFilePondInit"
           v-bind:onload="handleFilePondOnload"
@@ -131,7 +131,7 @@ export default {
           formData.append(fieldName, file, file.name);
 
           const request = new XMLHttpRequest();
-          request.open("POST", "http://127.0.0.1:8000/upload/");
+          request.open("POST", "http://127.0.0.1:8000/upload");
 
           // Should call the progress method to update the progress to 100% before calling load
           // Setting computable to false switches the loading indicator to infinite mode
