@@ -1,16 +1,20 @@
 <template>
   <div class="wrapper">
+    <div class="vld-parent">
+      <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="fullPage"></loading>
+    </div>
     <side-bar>
       <template slot="links">
         <file-pond
-          name="test"
+          name="file"
           ref="pond"
           label-idle="Drop Images here..."
           allow-multiple="true"
           accepted-file-types="image/jpeg, image/png"
-          server="http://127.0.0.1:8000/test/"
+          v-bind:server="myServer"
           v-bind:files="myFiles"
           v-on:init="handleFilePondInit"
+          v-bind:onload="handleFilePondOnload"
           style="margin-right:5%;margin-left:5%;"
         />
         <div class="row">
@@ -111,16 +115,70 @@ import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import MobileMenu from "./MobileMenu";
 import axios from "axios";
+// Import component
+import Loading from "vue-loading-overlay";
+// Import stylesheet
+import "vue-loading-overlay/dist/vue-loading.css";
 export default {
   components: {
     TopNavbar,
     ContentFooter,
     DashboardContent,
     MobileMenu,
-    FilePond
+    FilePond,
+    Loading
   },
   data: function() {
-    return { myFiles: [], output: null };
+    return {
+      myServer: {
+        process: (fieldName, file, metadata, load, error, progress, abort) => {
+          // fieldName is the name of the input field
+          // file is the actual file object to send
+          const formData = new FormData();
+          formData.append(fieldName, file, file.name);
+
+          const request = new XMLHttpRequest();
+          request.open("POST", "http://127.0.0.1:8000/upload/");
+
+          // Should call the progress method to update the progress to 100% before calling load
+          // Setting computable to false switches the loading indicator to infinite mode
+          request.upload.onprogress = e => {
+            progress(e.lengthComputable, e.loaded, e.total);
+          };
+
+          // Should call the load method when done and pass the returned server file id
+          // this server file id is then used later on when reverting or restoring a file
+          // so your server knows which file to return without exposing that info to the client
+          request.onload = function() {
+            if (request.status >= 200 && request.status < 300) {
+              console.log(request.responseText);
+              // the load method accepts either a string (id) or an object
+              load(request.responseText);
+            } else {
+              // Can call the error method if something is wrong, should exit after
+              error("oh no");
+            }
+          };
+
+          request.send(formData);
+
+          // Should expose an abort method so the request can be cancelled
+          return {
+            abort: () => {
+              // This function is entered if the user has tapped the cancel button
+              request.abort();
+
+              // Let FilePond know the request has been cancelled
+              abort();
+            }
+          };
+        }
+      },
+      isLoading: false,
+      fullPage: true,
+      myFiles: [],
+      output: null
+    };
   },
   methods: {
     getCookie(name) {
@@ -140,9 +198,14 @@ export default {
     },
 
     updateMap() {
+      this.isLoading = true;
       axios({
-        method: "post",
-        url: "http://127.0.0.1:8000/test/",
+        method: "get",
+        url:
+          "http://127.0.0.1:8000/getimage/?latitude=" +
+          this.$refs.long.value +
+          "&longitude=" +
+          this.$refs.lat.value,
 
         auth: {
           username: "admin",
@@ -155,6 +218,7 @@ export default {
 
       this.output = [this.$refs.long.value, this.$refs.lat.value];
       serverBus.$emit("long", this.output);
+      this.isLoading = false;
     },
 
     toggleSidebar() {
@@ -164,6 +228,9 @@ export default {
     },
     handleFilePondInit: function() {
       console.log("FilePond has initialized");
+    },
+    handleFilePondOnload: function(response) {
+      console.log(response);
 
       // FilePond instance methods are available on `this.$refs.pond`
     }
