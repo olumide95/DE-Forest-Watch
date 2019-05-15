@@ -1,5 +1,3 @@
-# DE-Forest-Watch
-
 # Digital Explorers Hackathon
 
 ## The Problem Statement
